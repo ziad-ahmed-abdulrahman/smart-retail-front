@@ -1,0 +1,1469 @@
+<!-- Notification Toast -->
+<div *ngIf="alertMessage" class="alert-toast" [ngClass]="alertType">
+  <span>{{ alertMessage }}</span>
+</div>
+
+<!-- ================= GUEST / AUTHENTICATION ================= -->
+<div *ngIf="!isLoggedIn" class="auth-screen">
+  <div class="auth-card-luxury">
+    <div class="auth-logo-row">
+      <div class="luxury-brand">
+        <div class="brand-logo-icon large">
+          <svg viewBox="0 0 44 44" class="brand-svg">
+            <rect width="44" height="44" rx="10" fill="#1F1D1A" />
+            <rect x="2" y="2" width="40" height="40" rx="8" fill="none" stroke="#B08D57" stroke-width="1.8" />
+            <text x="22" y="31" font-family="'Cormorant Garamond', Georgia, serif" font-size="24" font-weight="700"
+              fill="#B08D57" text-anchor="middle">M</text>
+          </svg>
+        </div>
+        <span class="brand-text">MUDAR</span>
+      </div>
+    </div>
+
+    <!-- 1. LOGIN -->
+    <div *ngIf="authView === 'login'">
+      <h2 class="auth-title">تسجيل الدخول</h2>
+      <div class="form-group">
+        <label>البريد الإلكتروني</label>
+        <input type="email" [(ngModel)]="loginEmail" placeholder="name@example.com" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label>كلمة المرور</label>
+        <input type="password" [(ngModel)]="loginPassword" placeholder="••••••••" class="form-control" />
+      </div>
+      <button class="btn btn-primary btn-block btn-lg" (click)="handleLogin()">تسجيل الدخول</button>
+
+      <div class="auth-divider"><span>أو</span></div>
+      <button class="btn btn-secondary btn-block" (click)="authView = 'register'">إنشاء حساب تاجر جديد</button>
+      <div class="auth-sub-links" style="margin-top: 1rem;">
+        <button class="btn-link-clean" (click)="authView = 'forgot'">نسيت كلمة المرور؟</button>
+      </div>
+    </div>
+
+    <!-- 2. REGISTER -->
+    <div *ngIf="authView === 'register'">
+      <h2 class="auth-title">إنشاء حساب تاجر جديد</h2>
+      <div class="form-group">
+        <label>اسم التاجر / المالك *</label>
+        <input type="text" [(ngModel)]="regFullName" placeholder="الاسم الكامل" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label>البريد الإلكتروني *</label>
+        <input type="email" [(ngModel)]="regEmail" placeholder="name@example.com" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label>كلمة المرور (8 خانات تتضمن رقماً ورمزاً وحرفاً كبيراً) *</label>
+        <input type="password" [(ngModel)]="regPassword" placeholder="••••••••" class="form-control" />
+      </div>
+      <button class="btn btn-primary btn-block btn-lg" (click)="handleRegister()">إنشاء الحساب</button>
+      <div class="auth-divider"><span>لديك حساب بالفعل؟</span></div>
+      <button class="btn btn-secondary btn-block" (click)="authView = 'login'">العودة لتسجيل الدخول</button>
+    </div>
+
+    <!-- 3. ACTIVATE -->
+    <div *ngIf="authView === 'activate'">
+      <h2 class="auth-title">تأكيد وتفعيل الحساب</h2>
+      <p class="auth-subtitle">تم إرسال رمز تحقق مكوّن من 6 أرقام إلى: <strong>{{ actEmail }}</strong></p>
+      <div class="form-group">
+        <label>رمز التحقق (OTP)</label>
+        <input type="text" [(ngModel)]="actCode" placeholder="123456" class="form-control" style="text-align: center; letter-spacing: 4px; font-size: 1.25rem; font-weight: 600;" maxlength="6" />
+      </div>
+      <button class="btn btn-primary btn-block btn-lg" (click)="handleVerifyActivation()">تأكيد وتفعيل الحساب</button>
+      <div class="auth-sub-links" style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.6rem;">
+        <button class="btn-link-clean" (click)="handleResendActivationCode()">لم يصلك الرمز؟ إعادة إرسال كود جديد</button>
+        <button class="btn-link-clean" style="color: var(--ink-soft);" (click)="authView = 'login'">الرجوع لتسجيل الدخول</button>
+      </div>
+    </div>
+
+    <!-- 4. FORGOT PASSWORD -->
+    <div *ngIf="authView === 'forgot'">
+      <h2 class="auth-title">استرجاع كلمة المرور</h2>
+      <p class="auth-subtitle">أدخل بريدك الإلكتروني لاستلام رمز استعادة كلمة المرور.</p>
+      <div class="form-group">
+        <label>البريد الإلكتروني</label>
+        <div class="input-with-action">
+          <input type="email" [(ngModel)]="forgotEmail" placeholder="name@example.com" class="form-control" />
+          <button class="btn btn-secondary" (click)="handleSendReset()">إرسال الرمز</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>رمز التحقق</label>
+        <input type="text" [(ngModel)]="forgotCode" placeholder="الرمز المكون من 6 أرقام" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label>كلمة المرور الجديدة</label>
+        <input type="password" [(ngModel)]="forgotNewPassword" placeholder="••••••••" class="form-control" />
+      </div>
+      <button class="btn btn-primary btn-block btn-lg" (click)="handleVerifyReset()">تحديث كلمة المرور</button>
+      <div class="auth-sub-links">
+        <button class="btn-link-clean" (click)="authView = 'login'">الرجوع لتسجيل الدخول</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= LOGGED IN OWNER APPLICATION ================= -->
+<div *ngIf="isLoggedIn" class="portal-root">
+
+  <!-- Quiet Luxury Header -->
+  <header class="header-main">
+    <div class="header-content">
+      <!-- Brand Logo -->
+      <div class="brand-zone" (click)="setTab('dashboard')">
+        <div class="brand-logo-icon">
+          <svg viewBox="0 0 32 32" class="brand-svg">
+            <rect width="32" height="32" rx="7" fill="#1F1D1A" />
+            <rect x="1.5" y="1.5" width="29" height="29" rx="6" fill="none" stroke="#B08D57" stroke-width="1.5" />
+            <text x="16" y="23" font-family="'Cormorant Garamond', Georgia, serif" font-size="18" font-weight="700"
+              fill="#B08D57" text-anchor="middle">M</text>
+          </svg>
+        </div>
+        <div class="brand-title">MUDAR</div>
+      </div>
+
+      <!-- Quick Branch / Store Selector in Header -->
+      <div class="header-store-selector" *ngIf="stores.length > 0">
+        <div class="selector-meta">
+          <span class="label-tiny">المتجر / الفرع الحالي:</span>
+          <select class="store-dropdown-header" [ngModel]="selectedStore?.id"
+            (ngModelChange)="onSelectStore(stores[$any($event) - 1] || stores[0])">
+            <option *ngFor="let s of stores" [value]="s.id">
+              {{ s.name }}{{ s.city ? ' - ' + s.city : '' }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <!-- User Profile & Logout -->
+      <div class="header-user-actions">
+        <div class="user-info-text">
+          <span class="user-name">{{ merchantDisplayName }}</span>
+          <span class="user-role">حساب تاجر معتمد</span>
+        </div>
+        <button class="btn-logout" (click)="logout()">تسجيل الخروج</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Secondary Navigation Bar (Minimalist Line Tabs) -->
+  <nav class="sub-nav">
+    <div class="sub-nav-content">
+      <button class="sub-nav-btn" [class.active]="currentTab === 'dashboard'" (click)="setTab('dashboard')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="3" width="7" height="9" rx="1"></rect>
+          <rect x="14" y="3" width="7" height="5" rx="1"></rect>
+          <rect x="14" y="12" width="7" height="9" rx="1"></rect>
+          <rect x="3" y="16" width="7" height="5" rx="1"></rect>
+        </svg>
+        لوحة التحكم العامة
+      </button>
+      <button class="sub-nav-btn" [class.active]="currentTab === 'stores'" (click)="setTab('stores')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        إدارة الفروع والمتاجر
+      </button>
+      <button class="sub-nav-btn" [class.active]="currentTab === 'products'" (click)="setTab('products')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line>
+          <path
+            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+          </path>
+          <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+          <line x1="12" y1="22.08" x2="12" y2="12"></line>
+        </svg>
+        المنتجات والمخزون
+      </button>
+      <button class="sub-nav-btn" [class.active]="currentTab === 'categories'" (click)="setTab('categories')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+        </svg>
+        فئات وأقسام المتجر
+      </button>
+      <button class="sub-nav-btn" [class.active]="currentTab === 'map'" (click)="setTab('map')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+          <line x1="8" y1="2" x2="8" y2="18"></line>
+          <line x1="16" y1="6" x2="16" y2="22"></line>
+        </svg>
+        خريطة المتجر التفاعلية
+      </button>
+      <button class="sub-nav-btn" [class.active]="currentTab === 'devices'" (click)="setTab('devices')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+          <rect x="9" y="9" width="6" height="6"></rect>
+          <line x1="9" y1="1" x2="9" y2="4"></line>
+          <line x1="15" y1="1" x2="15" y2="4"></line>
+          <line x1="9" y1="20" x2="9" y2="23"></line>
+          <line x1="15" y1="20" x2="15" y2="23"></line>
+          <line x1="20" y1="9" x2="23" y2="9"></line>
+          <line x1="20" y1="14" x2="23" y2="14"></line>
+          <line x1="1" y1="9" x2="4" y2="9"></line>
+          <line x1="1" y1="14" x2="4" y2="14"></line>
+        </svg>
+        أجهزة الفرع
+      </button>
+      <button class="sub-nav-btn" [class.active]="currentTab === 'profile'" (click)="setTab('profile')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        الملف الشخصي
+      </button>
+    </div>
+  </nav>
+
+  <!-- MAIN BODY -->
+  <main class="page-container">
+
+    <!-- ================= VIEW 1: DASHBOARD ================= -->
+    <section *ngIf="currentTab === 'dashboard'" class="tab-view">
+      <!-- Welcome Banner -->
+      <div class="dashboard-hero">
+        <div class="hero-text">
+          <h2>لوحة التحكم المباشرة</h2>
+          <p>نظرة شاملة وسريعة على كافة متاجرك ومنتجاتك وأقسام السوبرماركت التلقائي.</p>
+        </div>
+        <div class="hero-actions">
+          <button class="btn btn-primary" (click)="openCreateStoreModal()">+ إضافة فرع / متجر جديد</button>
+          <button class="btn btn-secondary" (click)="openCreateProductModal()">+ إضافة منتج جديد</button>
+        </div>
+      </div>
+
+      <!-- Overview Stats Metrics Cards (Interactive with Arabic Numerals) -->
+      <div class="metrics-grid">
+        <div class="metric-card clickable-metric" (click)="setTab('stores')"
+          title="اضغط لعرض وإدارة كافة المتاجر والفروع">
+          <div class="metric-card-top">
+            <span class="metric-title">عدد الفروع والمتاجر</span>
+            <svg class="metric-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            </svg>
+          </div>
+          <div class="metric-body">
+            <span class="metric-value">{{ toArabicDigits(stores.length) }}</span>
+            <span class="metric-sub">{{ stores.length > 0 ? 'جميع الفروع تعمل' : 'لم تقم بإضافة فروع' }}</span>
+          </div>
+          <div class="metric-footer-action">
+            <span>إدارة الفروع &larr;</span>
+          </div>
+        </div>
+
+        <div class="metric-card clickable-metric" (click)="setTab('products')"
+          title="اضغط للانتقال إلى جدول كافة المنتجات">
+          <div class="metric-card-top">
+            <span class="metric-title">إجمالي المنتجات المسجلة</span>
+            <svg class="metric-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path
+                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+              </path>
+            </svg>
+          </div>
+          <div class="metric-body">
+            <span class="metric-value">{{ toArabicDigits(getTotalProductsCount()) }}</span>
+            <span class="metric-sub">عبر جميع المتاجر</span>
+          </div>
+          <div class="metric-footer-action">
+            <span>تصفح المنتجات &larr;</span>
+          </div>
+        </div>
+
+        <div class="metric-card clickable-metric" (click)="setTab('categories')"
+          title="اضغط للانتقال إلى فئات وأقسام المتجر">
+          <div class="metric-card-top">
+            <span class="metric-title">الأقسام والفئات</span>
+            <svg class="metric-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </div>
+          <div class="metric-body">
+            <span class="metric-value">{{ toArabicDigits(getTotalCategoriesCount()) }}</span>
+            <span class="metric-sub">متضمنة الفئات الافتراضية والفرعية</span>
+          </div>
+          <div class="metric-footer-action">
+            <span>إدارة الأقسام &larr;</span>
+          </div>
+        </div>
+
+        <div class="metric-card clickable-metric" (click)="setTab('map')"
+          title="اضغط للانتقال إلى خريطة المتجر وتوزيع الأماكن">
+          <div class="metric-card-top">
+            <span class="metric-title">الفرع النشط حالياً</span>
+            <svg class="metric-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+            </svg>
+          </div>
+          <div class="metric-body">
+            <span class="metric-value text-sm">{{ selectedStore?.name || 'لا يوجد' }}</span>
+            <span class="metric-sub">{{ selectedStore?.city || 'تحديد المتجر لإدارته' }}</span>
+          </div>
+          <div class="metric-footer-action">
+            <span>فتح الخريطة &larr;</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Shortcuts & Active Store Showcase -->
+      <div class="dashboard-columns">
+        <!-- Stores Quick List -->
+        <div class="card-box flex-2">
+          <div class="card-box-header">
+            <h3>فروعك المسجلة</h3>
+            <button class="btn-link" (click)="setTab('stores')">عرض الكل &larr;</button>
+          </div>
+          <div class="branches-mini-list" *ngIf="stores.length > 0">
+            <div *ngFor="let s of stores" class="branch-item-mini" [class.active-branch]="s.id === selectedStore?.id"
+              (click)="onSelectStore(s)">
+              <div class="branch-info">
+                <h4>{{ s.name }}</h4>
+                <p>{{ s.address || 'لا يوجد عنوان محدد' }} - {{ s.city }}</p>
+              </div>
+              <div class="branch-stats">
+                <span>{{ toArabicDigits(s.productsCount) }} منتج</span>
+                <span>{{ toArabicDigits(s.categoriesCount) }} قسم</span>
+                <span class="badge-status-pill" [class.on]="s.isActive">{{ s.isActive ? 'نشط' : 'متوقف' }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="empty-state" *ngIf="stores.length === 0">
+            <p>لم يتم تسجيل أي فرع حتى الآن.</p>
+            <button class="btn btn-primary btn-sm" (click)="openCreateStoreModal()">أضف أول متجر لك الآن</button>
+          </div>
+        </div>
+
+        <!-- Quick Access to Selected Store Management -->
+        <div class="card-box flex-1" *ngIf="selectedStore">
+          <div class="card-box-header">
+            <h3>إدارة: {{ selectedStore.name }}</h3>
+          </div>
+          <div class="quick-links-panel">
+            <button class="quick-link-btn" (click)="setTab('products')">
+              <div class="icon-circle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path
+                    d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                  </path>
+                </svg>
+              </div>
+              <div class="text">
+                <strong>منتجات هذا المتجر</strong>
+                <small>{{ toArabicDigits(selectedStore.productsCount) }} منتج مسجل بالباركود والأسعار</small>
+              </div>
+            </button>
+            <button class="quick-link-btn" (click)="setTab('categories')">
+              <div class="icon-circle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+              </div>
+              <div class="text">
+                <strong>أقسام وفئات المتجر</strong>
+                <small>{{ toArabicDigits(selectedStore.categoriesCount) }} فئة معرفة</small>
+              </div>
+            </button>
+            <button class="quick-link-btn" (click)="setTab('map')">
+              <div class="icon-circle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+                </svg>
+              </div>
+              <div class="text">
+                <strong>خريطة المحل وتقسيم الأماكن</strong>
+                <small>تعديل أماكن العرض وبلوكات الأقسام</small>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= VIEW 2: STORES & BRANCHES ================= -->
+    <section *ngIf="currentTab === 'stores'" class="tab-view">
+      <div class="view-header">
+        <div>
+          <h2>إدارة المتاجر والفروع</h2>
+          <p>يمكنك كمالك إضافة أي عدد من الفروع وإدارة بيانات كل متجر ومنتجاته على حدة.</p>
+        </div>
+        <button class="btn btn-primary" (click)="openCreateStoreModal()">+ إضافة متجر / فرع جديد</button>
+      </div>
+
+      <div class="cards-grid">
+        <div *ngFor="let s of stores" class="retail-card" [class.selected-store-border]="s.id === selectedStore?.id">
+          <div class="card-top-row">
+            <span class="badge-status-pill" [class.on]="s.isActive">{{ s.isActive ? 'فرع نشط' : 'غير نشط' }}</span>
+            <span class="current-indicator" *ngIf="s.id === selectedStore?.id">المتجر المحدد حالياً</span>
+          </div>
+
+          <h3 class="retail-title">{{ s.name }}</h3>
+          <p class="retail-subtitle">{{ s.city || 'المدينة غير محددة' }} • {{ s.address || 'العنوان غير محدد' }}</p>
+
+          <div class="retail-stats-row">
+            <div class="stat-col">
+              <span class="stat-number">{{ toArabicDigits(s.productsCount) }}</span>
+              <span class="stat-label">منتج</span>
+            </div>
+            <div class="stat-col">
+              <span class="stat-number">{{ toArabicDigits(s.categoriesCount) }}</span>
+              <span class="stat-label">قسم وفئة</span>
+            </div>
+            <div class="stat-col">
+              <span class="stat-number">{{ toArabicDigits(s.devicesCount || 0) }}</span>
+              <span class="stat-label">أجهزة ذكية</span>
+            </div>
+          </div>
+
+          <div class="retail-actions">
+            <button class="btn btn-secondary btn-sm" (click)="onSelectStore(s)">اختيار لإدارة المحتوى</button>
+            <button class="btn btn-outline btn-sm" (click)="openEditStoreModal(s, $event)">تعديل البيانات</button>
+            <button class="btn btn-danger-outline btn-sm" (click)="deleteStore(s, $event)">حذف</button>
+          </div>
+        </div>
+
+        <div class="empty-state-full" *ngIf="stores.length === 0">
+          <svg class="empty-icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          </svg>
+          <h3>لا يوجد متاجر مضافة بعد</h3>
+          <p>ابدأ بإضافة أول فرع لسوبرماركتك الذكي لإدارة منتجاته وخريطته.</p>
+          <button class="btn btn-primary" (click)="openCreateStoreModal()">إضافة متجر جديد</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= VIEW 3: PRODUCTS & INVENTORY ================= -->
+    <section *ngIf="currentTab === 'products'" class="tab-view">
+      <div class="view-header">
+        <div>
+          <h2>مخزون ومنتجات: {{ selectedStore?.name }}</h2>
+          <p>إدارة قوائم السلع، الأسعار، الباركود، والكميات المتوفرة داخل هذا المتجر.</p>
+        </div>
+        <div class="header-tools">
+          <button class="btn btn-primary" (click)="openCreateProductModal()">+ إضافة منتج جديد</button>
+        </div>
+      </div>
+
+      <!-- Retail Search & Filter Bar -->
+      <div class="search-filter-bar">
+        <div class="search-input-group">
+          <svg class="search-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" [(ngModel)]="productSearchBarcode" placeholder="ابحث بالباركود مباشرة..."
+            class="search-field" (keyup.enter)="searchProductByBarcode()" />
+          <button class="btn btn-secondary" (click)="searchProductByBarcode()">بحث</button>
+        </div>
+
+        <div class="filter-dropdown-group">
+          <label>تصنيف القسم:</label>
+          <select [(ngModel)]="productFilterCategory" (change)="loadProducts()" class="form-control select-compact">
+            <option [ngValue]="null">كافة الأقسام</option>
+            <option *ngFor="let c of allCategoriesFlat" [ngValue]="c.id">{{ c.isSub ? '&nbsp;&nbsp;&nbsp;↳ ' + c.name :
+              c.name }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Clean Retail Products Table -->
+      <div class="table-card">
+        <table class="luxury-table">
+          <thead>
+            <tr>
+              <th>المنتج</th>
+              <th>الباركود</th>
+              <th>السعر</th>
+              <th>المخزون المتوفر</th>
+              <th>القسم / الفئة</th>
+              <th>حالة العرض</th>
+              <th>الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of products">
+              <td>
+                <div class="prod-name-cell">
+                  <strong>{{ p.name }}</strong>
+                  <span class="prod-desc" *ngIf="p.description">{{ p.description }}</span>
+                </div>
+              </td>
+              <td><code class="code-barcode">{{ p.barcode }}</code></td>
+              <td><span class="price-val">{{ p.price }}</span> <span class="curr">ج.م</span></td>
+              <td>
+                <span class="stock-pill" [class.low]="p.stock < 10">{{ p.stock }} قطعة</span>
+              </td>
+              <td>
+                <span class="category-chip">{{ p.categoryName || 'متنوعة' }}</span>
+              </td>
+              <td>
+                <span class="badge-status-pill" [class.on]="p.isVisible">
+                  {{ p.isVisible ? 'معروض للزبائن' : 'مخفي' }}
+                </span>
+              </td>
+              <td class="table-actions-cell">
+                <div class="actions-flex">
+                  <button class="btn-table-action" (click)="openEditProductModal(p)">تعديل</button>
+                  <button class="btn-table-action" (click)="toggleProductVisibility(p)">
+                    {{ p.isVisible ? 'إخفاء' : 'إظهار' }}
+                  </button>
+                  <button class="btn-table-action danger" (click)="deleteProduct(p)">حذف</button>
+                </div>
+              </td>
+            </tr>
+
+            <tr *ngIf="products.length === 0 && !isLoadingProducts">
+              <td colspan="7" class="table-empty">
+                لا توجد منتجات مسجلة في هذا المتجر حتى الآن. اضغط على "+ إضافة منتج جديد" للبدء.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ================= VIEW 4: CATEGORIES ================= -->
+    <section *ngIf="currentTab === 'categories'" class="tab-view">
+      <div class="view-header">
+        <div>
+          <h2>أقسام وفئات: {{ selectedStore?.name }}</h2>
+          <p>إدارة الهيكل الهرمي للأقسام (الأقسام الرئيسية والأقسام الفرعية التابعة لها).</p>
+        </div>
+        <div class="header-tools">
+          <button class="btn btn-primary" (click)="openCreateCategoryModal()">+ إضافة قسم رئيسي</button>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <table class="luxury-table">
+          <thead>
+            <tr>
+              <th>اسم القسم</th>
+              <th>النوع</th>
+              <th>عدد المنتجات</th>
+              <th>اللون على الخريطة</th>
+              <th>الحالة</th>
+              <th>الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let cat of categories">
+              <!-- Main Category Row -->
+              <tr class="main-cat-row" [class.has-expanded-dropdown]="isCategoryExpanded(cat.id)">
+                <td>
+                  <div class="category-title-cell">
+                    <div class="cat-name-row">
+                      <strong>{{ cat.name }}</strong>
+                      <span *ngIf="cat.isDefault" class="badge-tag default-tag">الفئة الافتراضية</span>
+                    </div>
+                    <span class="prod-desc" *ngIf="cat.description">{{ cat.description }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="type-cell-flex">
+                    <span class="badge-tag main-tag">قسم رئيسي</span>
+                    <button *ngIf="cat.subCategories && cat.subCategories.length > 0" class="btn-subcat-badge"
+                      [class.active]="isCategoryExpanded(cat.id)" (click)="toggleCategoryAccordion(cat.id, $event)"
+                      title="اضغط لعرض أو إخفاء الفئات الفرعية">
+                      <span class="chevron-arrow" [class.rotated]="isCategoryExpanded(cat.id)">▼</span>
+                      <span>{{ isCategoryExpanded(cat.id) ? 'إخفاء الفئات الفرعية' : 'عرض الفئات الفرعية (' +
+                        toArabicDigits(cat.subCategories.length) + ')' }}</span>
+                    </button>
+                  </div>
+                </td>
+                <td>
+                  <button class="link-btn-count" (click)="openCategoryProductsModal(cat)"
+                    title="عرض وتصفح منتجات {{ cat.name }}">
+                    {{ toArabicDigits(cat.productsCount) }} منتج ⤢
+                  </button>
+                </td>
+                <td class="color-cell-center">
+                  <span class="color-sample-circle" [style.background-color]="cat.colorHex || '#B08D57'"
+                    [title]="cat.colorHex || '#B08D57'"></span>
+                </td>
+                <td>
+                  <span class="badge-status-pill" [class.on]="cat.isVisible">
+                    {{ cat.isVisible ? 'ظاهرة' : 'مخفية' }}
+                  </span>
+                </td>
+                <td class="table-actions-cell">
+                  <div class="actions-flex">
+                    <button class="btn-table-action" (click)="openCreateCategoryModal(cat)"
+                      title="إضافة فئة فرعية تابعة لهذا القسم">
+                      + فئة فرعية
+                    </button>
+                    <button class="btn-table-action" (click)="openCategoryProductsModal(cat)"
+                      title="عرض وتصفح المنتجات">
+                      المنتجات
+                    </button>
+                    <button class="btn-table-action" (click)="openEditCategoryModal(cat)">تعديل</button>
+                    <button class="btn-table-action" (click)="toggleCategoryVisibility(cat, $event)">
+                      {{ cat.isVisible ? 'إخفاء' : 'إظهار' }}
+                    </button>
+                    <button *ngIf="!cat.isDefault" class="btn-table-action danger"
+                      (click)="promptDeleteCategory(cat, $event)">
+                      حذف
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Dropdown List of Subcategories (Revealed Only on Click) -->
+              <tr *ngIf="isCategoryExpanded(cat.id)" class="subcat-dropdown-panel-row">
+                <td colspan="6" class="subcat-dropdown-panel-cell">
+                  <div class="subcat-dropdown-box">
+                    <div class="subcat-dropdown-header">
+                      <div class="subcat-dropdown-title">
+                        <span class="dropdown-icon">↳</span>
+                        <strong>الفئات الفرعية التابعة لقسم: {{ cat.name }}</strong>
+                        <span class="dropdown-badge">{{ toArabicDigits(cat.subCategories?.length || 0) }} فئات
+                          فرعية</span>
+                      </div>
+                      <button class="btn btn-primary btn-xs" (click)="openCreateCategoryModal(cat)">
+                        + إضافة فئة فرعية جديدة
+                      </button>
+                    </div>
+
+                    <div class="subcat-dropdown-items-grid">
+                      <div *ngFor="let sub of cat.subCategories" class="subcat-dropdown-card-item">
+                        <div class="subcat-card-info">
+                          <span class="subcat-card-bullet">●</span>
+                          <div>
+                            <strong class="subcat-card-name">{{ sub.name }}</strong>
+                            <p class="subcat-card-desc" *ngIf="sub.description">{{ sub.description }}</p>
+                          </div>
+                        </div>
+
+                        <div class="subcat-card-center">
+                          <button class="link-btn-count" (click)="openCategoryProductsModal(sub)"
+                            title="عرض منتجات {{ sub.name }}">
+                            {{ toArabicDigits(sub.productsCount) }} منتج ⤢
+                          </button>
+                          <span class="badge-status-pill" [class.on]="sub.isVisible">
+                            {{ sub.isVisible ? 'ظاهرة' : 'مخفية' }}
+                          </span>
+                        </div>
+
+                        <div class="subcat-card-actions">
+                          <button class="btn-table-action" (click)="openCategoryProductsModal(sub)"
+                            title="عرض وتصفح المنتجات">المنتجات</button>
+                          <button class="btn-table-action" (click)="openEditCategoryModal(sub)">تعديل</button>
+                          <button class="btn-table-action" (click)="toggleCategoryVisibility(sub, $event)">
+                            {{ sub.isVisible ? 'إخفاء' : 'إظهار' }}
+                          </button>
+                          <button class="btn-table-action danger"
+                            (click)="promptDeleteCategory(sub, $event)">حذف</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+
+            <tr *ngIf="categories.length === 0 && !isLoadingCategories">
+              <td colspan="6" class="table-empty">
+                لا توجد فئات بعد في هذا المتجر. اضغط على "+ إضافة قسم رئيسي" للبدء.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ================= VIEW 5: INTERACTIVE SUPERMARKET MAP ================= -->
+    <section *ngIf="currentTab === 'map'" class="tab-view">
+      <div class="view-header">
+        <div>
+          <h2>خريطة وتوزيع السوبرماركت: {{ selectedStore?.name }}</h2>
+          <p>تخطيط أماكن الأقسام كما يراها العميل داخل المتجر، اضغط على أي قسم لعرض أجزائه الداخلية أو ملاحة العميل.</p>
+        </div>
+        <div class="header-tools">
+          <button class="btn btn-secondary" (click)="loadCategories()">تحديث الخريطة</button>
+          <button class="btn btn-primary" (click)="openCreateCategoryModal()">+ إضافة قسم للخريطة</button>
+        </div>
+      </div>
+
+      <!-- Supermarket Map Container (Interactive Drag & Drop Canvas Matching Image 5 & 6) -->
+      <div class="supermarket-map-frame">
+        <div class="map-top-bar">
+          <div class="map-top-bar-right">
+            <button *ngIf="selectedCategoryForMap" class="btn btn-outline btn-sm" (click)="clearMapSelection()">
+              &larr; عرض الخريطة بالكامل
+            </button>
+            <div class="map-breadcrumb" *ngIf="selectedCategoryForMap">
+              القسم المحدد: <strong>{{ selectedCategoryForMap.name }}</strong>
+              <span *ngIf="selectedSubCategoryForMap" class="breadcrumb-sub"> &lsaquo; {{ selectedSubCategoryForMap.name
+                }}</span>
+            </div>
+            <div class="map-hint-text" *ngIf="!selectedCategoryForMap">
+              <span>💡 اضغط على أي قسم لعرض فئاته الفرعية ومسار الدخول، واسحب أي عنصر لتغيير موضعه بحرية.</span>
+            </div>
+          </div>
+          <div class="map-top-bar-actions">
+            <button class="btn btn-primary btn-sm btn-save-layout" (click)="saveMapLayout()"
+              [disabled]="isSavingMapLayout" title="حفظ إحداثيات ومواقع كافة الأقسام ونقطة الدخول في قاعدة البيانات">
+              💾 {{ isSavingMapLayout ? 'جاري الحفظ...' : 'حفظ تخطيط ومواقع الخريطة' }}
+            </button>
+            <button class="btn btn-secondary btn-sm" (click)="autoArrangeMapLayout()"
+              title="إعادة ترتيب الأقسام على محيط المتجر مثل التصميم الافتراضي">
+              ↺ ترتيب الأقسام الافتراضي
+            </button>
+          </div>
+        </div>
+
+        <div class="map-viewport-interactive" (mousemove)="onCanvasMouseMove($event)" (mouseup)="stopDrag()"
+          (mouseleave)="stopDrag()" (touchmove)="onTouchMove($event)" (touchend)="onTouchEnd()"
+          (touchcancel)="onTouchEnd()" (click)="onCanvasBackgroundClick($event)">
+
+          <!-- Animated Navigation Path Line (SVG) from entrance to selected category pin -->
+          <svg class="map-path-svg-overlay" *ngIf="selectedCategoryForMap && getActiveCategoryPinCoords()">
+            <line [attr.x1]="entrancePosition.x + '%'" [attr.y1]="entrancePosition.y + '%'"
+              [attr.x2]="getActiveCategoryPinCoords()!.x + '%'" [attr.y2]="getActiveCategoryPinCoords()!.y + '%'"
+              stroke="#56C5B3" stroke-width="3.5" stroke-dasharray="6,6" class="animated-guidance-line" />
+          </svg>
+
+          <!-- Movable Category Blocks (Matching Image 5 & Image 6) -->
+          <div *ngFor="let cat of categories; let i = index" class="movable-category-card"
+            [class.active-category]="isCategoryActive(cat)"
+            [class.dimmed-category]="selectedCategoryForMap && !isCategoryActive(cat)"
+            [style.top.%]="categoryPositions[cat.id]?.y || getPerimeterSlot(i).y"
+            [style.left.%]="categoryPositions[cat.id]?.x || getPerimeterSlot(i).x"
+            [style.background-color]="getCategoryColor(cat, i)" (mousedown)="startDrag('category', cat.id, $event)"
+            (touchstart)="onTouchStart('category', cat.id, $event)" (click)="onCategoryCardClick(cat, $event)">
+
+            <!-- Drag Grip -->
+            <div class="card-drag-grip" title="اسحب لتحريك القسم في أي مكان على الخريطة">⠿</div>
+
+            <!-- Normal State (Image 5) -->
+            <div *ngIf="!isCategoryActive(cat)" class="cat-collapsed-body">
+              <h4 class="cat-card-title">{{ cat.name }}</h4>
+              <span class="cat-card-sub">{{ toArabicDigits(cat.subCategories?.length || 0) }} أقسام</span>
+            </div>
+
+            <!-- Expanded State In-Place (Image 6) -->
+            <div *ngIf="isCategoryActive(cat)" class="cat-expanded-body">
+              <div class="cat-expanded-header">
+                <h4 class="cat-card-title">{{ cat.name }}</h4>
+              </div>
+
+              <!-- In-Place Subcategories 2x2 Grid -->
+              <div class="cat-subcategories-grid" *ngIf="cat.subCategories && cat.subCategories.length > 0">
+                <div *ngFor="let sub of cat.subCategories" class="cat-sub-tile"
+                  [class.active-sub-tile]="selectedSubCategoryForMap?.id === sub.id"
+                  (click)="onSubCategoryClick(sub, $event)" title="اضغط لتصفية منتجات {{ sub.name }}">
+                  <span class="sub-tile-name">{{ sub.name }}</span>
+                  <span class="sub-tile-count">{{ toArabicDigits(sub.productsCount || 0) }} منتج</span>
+                </div>
+              </div>
+
+              <!-- If no subcategories yet -->
+              <div class="cat-no-subcategories" *ngIf="!cat.subCategories || cat.subCategories.length === 0">
+                <span class="no-sub-text">لا توجد أقسام فرعية بعد</span>
+                <button class="btn btn-outline-light btn-xs" (click)="openCreateCategoryModal(cat, $event)">+ فئة
+                  فرعية</button>
+              </div>
+
+              <!-- Location Pin Marker at Bottom Edge of Active Category (Image 6) -->
+              <div class="active-category-pin">
+                <div class="pin-marker-body">
+                  <div class="pin-marker-inner-dot"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Movable Entrance Beacon on Floor -->
+          <div class="supermarket-entrance-beacon movable-item" [style.top.%]="entrancePosition.y"
+            [style.left.%]="entrancePosition.x" (mousedown)="startDrag('beacon', undefined, $event)"
+            (touchstart)="onTouchStart('beacon', undefined, $event)" title="اسحب لتغيير موضع نقطة الدخول (أنت هنا)">
+            <div class="beacon-circle-dot"></div>
+            <span class="beacon-label-text">أنت هنا</span>
+          </div>
+
+        </div>
+
+        <!-- Live Products Shelf for Selected Category on Map -->
+        <div class="map-products-showcase" *ngIf="selectedCategoryForMap">
+          <div class="showcase-header">
+            <div class="showcase-title">
+              <span class="showcase-icon">🛒</span>
+              <div>
+                <h4>
+                  منتجات قسم:
+                  <strong class="highlight-cat">{{ selectedSubCategoryForMap ? selectedSubCategoryForMap.name :
+                    selectedCategoryForMap.name }}</strong>
+                  <span *ngIf="selectedSubCategoryForMap" class="filter-active-chip">فئة فرعية مفلترة</span>
+                </h4>
+                <p>
+                  إجمالي المعروض: <strong>{{ toArabicDigits(categoryMapProducts.length) }}</strong> منتج
+                  <span *ngIf="selectedSubCategoryForMap" class="clear-filter-link"
+                    (click)="onSubCategoryBoxClick(selectedSubCategoryForMap)">
+                    (إلغاء فلترة الفئة الفرعية وعرض كافة منتجات {{ selectedCategoryForMap.name }})
+                  </span>
+                </p>
+              </div>
+            </div>
+            <div class="showcase-tools">
+              <button class="btn btn-primary btn-sm"
+                (click)="openAddProductForCategory(selectedSubCategoryForMap || selectedCategoryForMap)">
+                + إضافة منتج جديد في {{ selectedSubCategoryForMap ? selectedSubCategoryForMap.name :
+                selectedCategoryForMap.name }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Loading State -->
+          <div *ngIf="isLoadingMapProductsList" class="showcase-loading">
+            <div class="luxury-spinner"></div>
+            <span>جاري تحميل المنتجات المعروضة على خريطة هذا القسم...</span>
+          </div>
+
+          <!-- Empty State -->
+          <div *ngIf="!isLoadingMapProductsList && categoryMapProducts.length === 0" class="showcase-empty">
+            <div class="empty-icon-circle">📦</div>
+            <h5>لا توجد منتجات مسجلة في قسم ({{ selectedSubCategoryForMap ? selectedSubCategoryForMap.name :
+              selectedCategoryForMap.name }}) حتى الآن.</h5>
+            <p>يمكنك الآن إضافة أول منتج في هذا القسم ليظهر للعميل أثناء التسوق في الخريطة.</p>
+            <button class="btn btn-primary btn-sm"
+              (click)="openAddProductForCategory(selectedSubCategoryForMap || selectedCategoryForMap)">
+              + إضافة أول منتج لهذا القسم
+            </button>
+          </div>
+
+          <!-- Products Shelf Grid -->
+          <div *ngIf="!isLoadingMapProductsList && categoryMapProducts.length > 0" class="showcase-grid">
+            <div *ngFor="let p of categoryMapProducts" class="shelf-product-card">
+              <div class="shelf-prod-top">
+                <span class="shelf-item-icon">📦</span>
+                <span class="shelf-stock" [class.low]="p.stock <= 5">المخزون: {{ toArabicDigits(p.stock) }}</span>
+              </div>
+              <h5 class="shelf-prod-name">{{ p.name }}</h5>
+              <span class="shelf-barcode">باركود: {{ p.barcode }}</span>
+              <div class="shelf-bottom">
+                <span class="shelf-price">{{ toArabicDigits(p.price) }} ج.م</span>
+                <button class="btn-table-action" (click)="openEditProductModal(p)">تعديل</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================= VIEW 6: DEVICES & IOT ================= -->
+    <section *ngIf="currentTab === 'devices'" class="tab-view">
+      <div class="view-header">
+        <div>
+          <h2>أجهزة وأنظمة الفرع الذكية: {{ selectedStore?.name }}</h2>
+          <p>إدارة وتتبع كاميرات الرؤية الحاسوبية ونقاط الدفع الذاتي التابعة لهذا الفرع.</p>
+        </div>
+        <div class="header-tools">
+          <button class="btn btn-primary" (click)="openCreateDeviceModal()">+ تسجيل جهاز جديد</button>
+        </div>
+      </div>
+
+      <!-- Empty State if no devices yet -->
+      <div class="card-box empty-devices-card" *ngIf="getStoreDevices().length === 0">
+        <div class="empty-devices-illustration">
+          <svg viewBox="0 0 64 64" class="devices-svg-large">
+            <rect x="8" y="8" width="48" height="48" rx="8" fill="none" stroke="var(--accent)" stroke-width="2" />
+            <rect x="22" y="22" width="20" height="20" rx="4" fill="none" stroke="var(--ink)" stroke-width="2" />
+            <circle cx="32" cy="32" r="4" fill="var(--accent)" />
+            <line x1="22" y1="8" x2="22" y2="16" stroke="var(--accent)" stroke-width="2" />
+            <line x1="42" y1="8" x2="42" y2="16" stroke="var(--accent)" stroke-width="2" />
+            <line x1="22" y1="48" x2="22" y2="56" stroke="var(--accent)" stroke-width="2" />
+            <line x1="42" y1="48" x2="42" y2="56" stroke="var(--accent)" stroke-width="2" />
+          </svg>
+        </div>
+        <h3>لا توجد أجهزة مربوطة بهذا الفرع حالياً</h3>
+        <p>
+          يدعم متجر MUDAR الربط الفوري مع كاميرات الرؤية الحاسوبية الذكية ونقاط الدفع الذاتي (Self-Checkout POS).
+        </p>
+        <button class="btn btn-primary" (click)="openCreateDeviceModal()">+ تسجيل أول جهاز لهذا الفرع</button>
+      </div>
+
+      <!-- Devices Grid if devices exist -->
+      <div class="devices-grid" *ngIf="getStoreDevices().length > 0">
+        <div *ngFor="let dev of getStoreDevices()" class="device-card">
+          <div class="device-card-header">
+            <span class="device-type-badge">{{ getDeviceTypeLabel(dev.type) }}</span>
+            <span class="badge-status-pill" [class.on]="dev.isOnline">
+              {{ dev.isOnline ? 'متصل ونشط' : 'غير متصل' }}
+            </span>
+          </div>
+          <h4 class="device-name">{{ dev.name }}</h4>
+          <span class="device-code">كود الجهاز: {{ dev.deviceCode }}</span>
+          <div class="device-meta">
+            <small>حالة الاتصال: استجابة فورية (Ping OK)</small>
+          </div>
+          <div class="device-actions">
+            <button class="btn-table-action danger" (click)="deleteDevice(dev)">إزالة الجهاز</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= VIEW 7: OWNER PROFILE ================= -->
+    <section *ngIf="currentTab === 'profile'" class="tab-view">
+
+      <!-- SUB-VIEW 1: OVERVIEW (READ-ONLY) -->
+      <div *ngIf="profileSubView === 'overview'">
+        <div class="view-header">
+          <div>
+            <h2>الملف الشخصي وإعدادات الحساب</h2>
+            <p>معاينة بيانات الحساب الشخصي، معلومات التواصل، ومواقع الفروع المسجلة.</p>
+          </div>
+          <button class="btn btn-primary" (click)="setProfileSubView('edit')">
+            تعديل البيانات الشخصية
+          </button>
+        </div>
+
+        <div class="profile-layout-grid">
+          <!-- Identity Card -->
+          <div class="card-box profile-side-summary">
+            <div class="profile-avatar-circle">
+              {{ merchantInitial }}
+            </div>
+            <h3 class="profile-name-title">{{ merchantDisplayName || 'تاجر مسجل' }}</h3>
+            <span class="profile-username-tag">@{{ profile?.userName }}</span>
+            <span class="badge-status-pill on" style="margin-top: 0.5rem;">حساب تاجر معتمد</span>
+
+            <div class="profile-meta-list">
+              <div class="meta-item">
+                <span class="meta-label">البريد الإلكتروني:</span>
+                <span class="meta-value">{{ profile?.email }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">حالة الحساب:</span>
+                <span class="meta-value" style="color: var(--success); font-weight: 600;">مفعل ونشط</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">الفروع النشطة:</span>
+                <span class="meta-value">{{ toArabicDigits(stores.length) }} فروع</span>
+              </div>
+            </div>
+
+            <div style="margin-top: 1.5rem; width: 100%;">
+              <button class="btn btn-secondary btn-block" (click)="setProfileSubView('edit')">
+                تعديل البيانات الشخصية
+              </button>
+            </div>
+          </div>
+
+          <!-- Main Information Cards -->
+          <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <!-- Personal and Contact Info -->
+            <div class="card-box" style="padding: 2rem;">
+              <div class="card-box-header">
+                <h3>المعلومات الشخصية وبيانات التواصل</h3>
+              </div>
+              <div class="profile-info-grid">
+                <div class="info-field-card">
+                  <span class="info-field-label">الاسم الكامل</span>
+                  <span class="info-field-value">{{ merchantDisplayName || 'غير مسجل' }}</span>
+                </div>
+                <div class="info-field-card">
+                  <span class="info-field-label">البريد الإلكتروني</span>
+                  <span class="info-field-value" style="direction: ltr; text-align: right;">{{ profile?.email }}</span>
+                </div>
+                <div class="info-field-card">
+                  <span class="info-field-label">رقم الهاتف</span>
+                  <span class="info-field-value">{{ profile?.phoneNumber ? toArabicDigits(profile.phoneNumber) : 'غير مسجل' }}</span>
+                </div>
+                <div class="info-field-card">
+                  <span class="info-field-label">الدولة</span>
+                  <span class="info-field-value">{{ profile?.address?.country || 'جمهورية مصر العربية' }}</span>
+                </div>
+                <div class="info-field-card">
+                  <span class="info-field-label">المحافظة والمدينة</span>
+                  <span class="info-field-value">{{ profile?.address?.government || 'غير مسجل' }}{{ profile?.address?.city ? (' - ' + profile.address.city) : '' }}</span>
+                </div>
+                <div class="info-field-card">
+                  <span class="info-field-label">العنوان التفصيلي</span>
+                  <span class="info-field-value">{{ profile?.address?.street || 'غير مسجل' }}</span>
+                </div>
+                <div class="info-field-card">
+                  <span class="info-field-label">الرمز البريدي</span>
+                  <span class="info-field-value">{{ profile?.address?.zipCode ? toArabicDigits(profile.address.zipCode) : 'غير مسجل' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Security & Password Card -->
+            <div class="card-box" style="padding: 2rem;">
+              <div class="card-box-header">
+                <h3>الأمان وكلمات المرور</h3>
+                <p style="color: var(--ink-soft); font-size: 0.88rem; margin-top: 0.35rem;">
+                  لحماية حسابك، يتم إرسال كود تحقق سري (OTP) إلى بريدك الإلكتروني لتأكيد هويتك قبل أي تغيير لكلمة المرور.
+                </p>
+              </div>
+              <div class="security-actions-row">
+                <button class="btn btn-secondary btn-lg" (click)="setProfileSubView('change-password')">
+                  تغيير كلمة المرور (بواسطة رمز التحقق)
+                </button>
+                <button class="btn btn-outline btn-lg" (click)="setProfileSubView('forgot-password')">
+                  نسيت كلمة المرور؟ (استعادة الحساب)
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB-VIEW 2: EDIT PROFILE -->
+      <div *ngIf="profileSubView === 'edit'">
+        <button class="btn-back-link" (click)="profileSubView = 'overview'">
+          ← الرجوع للملف الشخصي
+        </button>
+
+        <div class="card-box profile-main-form" style="max-width: 900px; margin: 0 auto;">
+          <div class="card-box-header">
+            <h3>تعديل البيانات الشخصية وعنوان العمل</h3>
+            <p style="color: var(--ink-soft); font-size: 0.88rem; margin-top: 0.25rem;">قم بتحديث معلوماتك وعنوانك الرسمي ثم احفظ التعديلات.</p>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col">
+              <label>الاسم الأول</label>
+              <input type="text" [(ngModel)]="editProfileData.firstName" placeholder="الاسم الأول" class="form-control" />
+            </div>
+            <div class="form-group col">
+              <label>اسم العائلة</label>
+              <input type="text" [(ngModel)]="editProfileData.lastName" placeholder="اسم العائلة" class="form-control" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col">
+              <label>رقم الهاتف</label>
+              <input type="text" [(ngModel)]="editProfileData.phoneNumber" (input)="onPhoneInput($event)" placeholder="رقم الهاتف" class="form-control" style="direction: ltr; text-align: right;" />
+            </div>
+            <div class="form-group col">
+              <label>الشارع والعنوان التفصيلي</label>
+              <input type="text" [(ngModel)]="editProfileData.address.street" placeholder="الشارع والعنوان التفصيلي" class="form-control" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col">
+              <label>المحافظة</label>
+              <select [(ngModel)]="editProfileData.address.government" class="form-control">
+                <option value="">اختر المحافظة</option>
+                <option *ngFor="let gov of egyptianGovernorates" [value]="gov">{{ gov }}</option>
+              </select>
+            </div>
+            <div class="form-group col">
+              <label>المدينة / المركز</label>
+              <input type="text" [(ngModel)]="editProfileData.address.city" placeholder="المدينة أو المنطقة" class="form-control" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col">
+              <label>الدولة</label>
+              <input type="text" [(ngModel)]="editProfileData.address.country" placeholder="الدولة" class="form-control" />
+            </div>
+            <div class="form-group col">
+              <label>الرمز البريدي</label>
+              <input type="text" [(ngModel)]="editProfileData.address.zipCode" (input)="onZipCodeInput($event)" placeholder="الرمز البريدي" class="form-control" />
+            </div>
+          </div>
+
+          <div class="profile-actions-bar">
+            <button class="btn btn-primary btn-lg" (click)="saveProfile()">حفظ التعديلات</button>
+            <button class="btn btn-secondary btn-lg" (click)="profileSubView = 'overview'">إلغاء</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB-VIEW 3: CHANGE PASSWORD (OTP VERIFICATION) -->
+      <div *ngIf="profileSubView === 'change-password'">
+        <button class="btn-back-link" (click)="profileSubView = 'overview'">
+          ← الرجوع للملف الشخصي
+        </button>
+
+        <div class="card-box profile-main-form" style="max-width: 680px; margin: 0 auto;">
+          <div class="card-box-header">
+            <h3>تغيير كلمة المرور</h3>
+            <p style="color: var(--ink-soft); font-size: 0.88rem; margin-top: 0.25rem;">
+              لحماية حسابك، يلزم تأكيد رمز التحقق (OTP) المرسل إلى بريدك الإلكتروني قبل تعيين كلمة مرور جديدة.
+            </p>
+          </div>
+
+          <div class="otp-banner-box">
+            <div class="otp-banner-text">
+              تم إرسال كود التحقق السري (OTP) إلى بريدك الإلكتروني:<br />
+              <span class="otp-banner-email">{{ profile?.email }}</span>
+            </div>
+            <button class="btn btn-secondary btn-sm" (click)="sendChangePasswordOtp()" [disabled]="isSendingChangePasswordCode">
+              {{ isSendingChangePasswordCode ? 'جاري الإرسال...' : 'إعادة إرسال رمز التحقق' }}
+            </button>
+          </div>
+
+          <div class="form-group" style="text-align: center;">
+            <label style="font-weight: 600;">رمز التحقق المكون من 6 أرقام *</label>
+            <div style="display: flex; justify-content: center; margin-top: 0.5rem;">
+              <input type="text" maxlength="6" [(ngModel)]="changePasswordCode" placeholder="••••••" class="form-control otp-input-large" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>كلمة المرور الحالية *</label>
+            <input type="password" [(ngModel)]="changePasswordOld" placeholder="كلمة المرور الحالية" class="form-control" />
+          </div>
+
+          <div class="form-group">
+            <label>كلمة المرور الجديدة * (8 أحرف أو أكثر)</label>
+            <input type="password" [(ngModel)]="changePasswordNew" placeholder="كلمة المرور الجديدة" class="form-control" />
+          </div>
+
+          <div class="form-group">
+            <label>تأكيد كلمة المرور الجديدة *</label>
+            <input type="password" [(ngModel)]="changePasswordConfirm" placeholder="تأكيد كلمة المرور الجديدة" class="form-control" />
+          </div>
+
+          <div class="profile-actions-bar">
+            <button class="btn btn-primary btn-lg" (click)="handleVerifyChangePasswordWithOtp()" [disabled]="isVerifyingChangePassword">
+              {{ isVerifyingChangePassword ? 'جاري التحقق والتحديث...' : 'تأكيد وتغيير كلمة المرور' }}
+            </button>
+            <button class="btn btn-secondary btn-lg" (click)="profileSubView = 'overview'">إلغاء</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB-VIEW 4: FORGOT / RESET PASSWORD (OTP VERIFICATION) -->
+      <div *ngIf="profileSubView === 'forgot-password'">
+        <button class="btn-back-link" (click)="profileSubView = 'overview'">
+          ← الرجوع للملف الشخصي
+        </button>
+
+        <div class="card-box profile-main-form" style="max-width: 680px; margin: 0 auto;">
+          <div class="card-box-header">
+            <h3>استعادة وتعيين كلمة المرور (نسيان كلمة المرور)</h3>
+            <p style="color: var(--ink-soft); font-size: 0.88rem; margin-top: 0.25rem;">
+              إذا نسيت كلمة المرور الحالية، يمكنك استعادة وتعيين كلمة مرور جديدة عبر رمز التحقق المرسل لبريدك الإلكتروني.
+            </p>
+          </div>
+
+          <div class="otp-banner-box">
+            <div class="otp-banner-text">
+              تم إرسال كود الاستعادة (OTP) إلى بريدك الإلكتروني:<br />
+              <span class="otp-banner-email">{{ profile?.email }}</span>
+            </div>
+            <button class="btn btn-secondary btn-sm" (click)="sendProfileResetOtp()" [disabled]="isSendingProfileResetCode">
+              {{ isSendingProfileResetCode ? 'جاري الإرسال...' : 'إعادة إرسال رمز الاستعادة' }}
+            </button>
+          </div>
+
+          <div class="form-group" style="text-align: center;">
+            <label style="font-weight: 600;">رمز التحقق المكون من 6 أرقام *</label>
+            <div style="display: flex; justify-content: center; margin-top: 0.5rem;">
+              <input type="text" maxlength="6" [(ngModel)]="profileResetCode" placeholder="••••••" class="form-control otp-input-large" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>كلمة المرور الجديدة * (8 أحرف أو أكثر)</label>
+            <input type="password" [(ngModel)]="profileResetNew" placeholder="كلمة المرور الجديدة" class="form-control" />
+          </div>
+
+          <div class="form-group">
+            <label>تأكيد كلمة المرور الجديدة *</label>
+            <input type="password" [(ngModel)]="profileResetConfirm" placeholder="تأكيد كلمة المرور الجديدة" class="form-control" />
+          </div>
+
+          <div class="profile-actions-bar">
+            <button class="btn btn-primary btn-lg" (click)="handleVerifyProfileResetWithOtp()" [disabled]="isVerifyingProfileReset">
+              {{ isVerifyingProfileReset ? 'جاري التحقق وتعيين كلمة المرور...' : 'إعادة تعيين كلمة المرور الآن' }}
+            </button>
+            <button class="btn btn-secondary btn-lg" (click)="profileSubView = 'overview'">إلغاء</button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+</div>
+
+<!-- ================= MODALS ================= -->
+
+<!-- 1. STORE MODAL -->
+<div *ngIf="showStoreModal" class="modal-backdrop">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>{{ storeFormMode === 'create' ? 'إضافة متجر / فرع جديد' : 'تعديل بيانات المتجر' }}</h3>
+      <button class="btn-close" (click)="showStoreModal = false">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>اسم المتجر / الفرع *</label>
+        <input type="text" [(ngModel)]="storeFormData.name" placeholder="اسم المتجر أو الفرع"
+          class="form-control" />
+      </div>
+      <div class="form-row">
+        <div class="form-group col">
+          <label>المدينة</label>
+          <input type="text" [(ngModel)]="storeFormData.city" placeholder="المدينة" class="form-control" />
+        </div>
+        <div class="form-group col" *ngIf="storeFormMode === 'edit'">
+          <label>حالة الفرع</label>
+          <select [(ngModel)]="storeFormData.isActive" class="form-control">
+            <option [ngValue]="true">نشط</option>
+            <option [ngValue]="false">متوقف</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>العنوان بالتفصيل</label>
+        <input type="text" [(ngModel)]="storeFormData.address" placeholder="الشارع ورقم المبنى..."
+          class="form-control" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="showStoreModal = false">إلغاء</button>
+      <button class="btn btn-primary" (click)="saveStore()">حفظ المتجر</button>
+    </div>
+  </div>
+</div>
+
+<!-- 2. CATEGORY MODAL -->
+<div *ngIf="showCategoryModal" class="modal-backdrop">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>
+        {{ categoryFormMode === 'create'
+        ? (categoryFormData.parentCategoryId ? 'إضافة قسم فرعي تابع' : 'إضافة قسم رئيسي جديد')
+        : 'تعديل بيانات القسم' }}
+      </h3>
+      <button class="btn-close" (click)="showCategoryModal = false">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>اسم القسم *</label>
+        <input type="text" [(ngModel)]="categoryFormData.name" placeholder="مثال: الألبان، اللحوم، المخبوزات..."
+          class="form-control" />
+      </div>
+      <div class="form-group">
+        <label>الوصف</label>
+        <textarea [(ngModel)]="categoryFormData.description" rows="2" class="form-control"
+          placeholder="وصف توضيحي للقسم..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>القسم الرئيسي التابع له (التبعية الهرمية)</label>
+        <select [(ngModel)]="categoryFormData.parentCategoryId" class="form-control">
+          <option [ngValue]="null">بدون - هذا قسم رئيسي على الخريطة</option>
+          <option *ngFor="let c of categories" [ngValue]="c.id">
+            قسم رئيسي: {{ c.name }}
+          </option>
+        </select>
+        <small class="hint-muted" *ngIf="categoryFormData.parentCategoryId">
+          سيظهر هذا القسم كفئة فرعية داخل القسم الرئيسي المحدد.
+        </small>
+      </div>
+      <div class="form-row">
+        <div class="form-group col">
+          <label>لون القسم في الخريطة</label>
+          <input type="color" [(ngModel)]="categoryFormData.colorHex" class="form-control color-input" />
+        </div>
+        <div class="form-group col">
+          <label>حالة العرض للزبائن</label>
+          <select [(ngModel)]="categoryFormData.isVisible" class="form-control">
+            <option [ngValue]="true">معروض</option>
+            <option [ngValue]="false">مخفي</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="showCategoryModal = false">إلغاء</button>
+      <button class="btn btn-primary" (click)="saveCategory()">حفظ القسم</button>
+    </div>
+  </div>
+</div>
+
+<!-- 3. PRODUCT MODAL -->
+<div *ngIf="showProductModal" class="modal-backdrop">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>{{ productFormMode === 'create' ? 'إضافة منتج جديد' : 'تعديل المنتج' }}</h3>
+      <button class="btn-close" (click)="showProductModal = false">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>اسم المنتج *</label>
+        <input type="text" [(ngModel)]="productFormData.name" placeholder="مثال: حليب كامل الدسم 1 لتر"
+          class="form-control" />
+      </div>
+      <div class="form-row">
+        <div class="form-group col">
+          <label>الباركود *</label>
+          <input type="text" [(ngModel)]="productFormData.barcode" placeholder="6281007010014" class="form-control" />
+        </div>
+        <div class="form-group col">
+          <label>السعر (ج.م) *</label>
+          <input type="number" [(ngModel)]="productFormData.price" class="form-control" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col">
+          <label>الكمية المتوفرة بالمخزون</label>
+          <input type="number" [(ngModel)]="productFormData.stock" class="form-control" />
+        </div>
+        <div class="form-group col">
+          <label>القسم / الفئة</label>
+          <select [(ngModel)]="productFormData.categoryId" class="form-control">
+            <option [ngValue]="null">افتراضية (متنوعة)</option>
+            <option *ngFor="let c of categories" [ngValue]="c.id">{{ c.name }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>الوصف</label>
+        <textarea [(ngModel)]="productFormData.description" rows="2" class="form-control"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="showProductModal = false">إلغاء</button>
+      <button class="btn btn-primary" (click)="saveProduct()">حفظ المنتج</button>
+    </div>
+  </div>
+</div>
+
+<!-- 4. DELETE CATEGORY DIALOG -->
+<div *ngIf="showDeleteCatModal" class="modal-backdrop">
+  <div class="modal-box delete-box">
+    <div class="modal-header">
+      <h3>حذف القسم: {{ deletingCategory?.name }}</h3>
+      <button class="btn-close" (click)="showDeleteCatModal = false">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p class="dialog-question">ماذا تريد أن تفعل بالمنتجات التابعة لهذا القسم؟</p>
+
+      <div class="choice-card">
+        <label>
+          <input type="radio" name="delProducts" [value]="false" [(ngModel)]="deleteProductsChoice" />
+          <strong>نقل المنتجات إلى الفئة الافتراضية "متنوعة" (موصى به)</strong>
+          <span class="choice-desc">لن تفقد أي منتجات، سيتم إعادة تصنيفها تحت فئة "متنوعة" الخاصة بهذا المتجر.</span>
+        </label>
+      </div>
+
+      <div class="choice-card danger-card">
+        <label>
+          <input type="radio" name="delProducts" [value]="true" [(ngModel)]="deleteProductsChoice" />
+          <strong>حذف القسم وجميع المنتجات التابعة له نهائياً</strong>
+          <span class="choice-desc text-danger">تحذير: سيتم مسح كافة المنتجات في هذا القسم بدون إمكانية
+            استرجاعها.</span>
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="showDeleteCatModal = false">إلغاء</button>
+      <button class="btn btn-danger" (click)="confirmDeleteCategory()">تأكيد الحذف</button>
+    </div>
+  </div>
+</div>
+
+<!-- 5. CATEGORY PRODUCTS QUICK-VIEW MODAL (Interactive Drilldown on Click) -->
+<div *ngIf="showCategoryProductsModal" class="modal-backdrop">
+  <div class="modal-box modal-wide-card">
+    <div class="modal-header">
+      <div>
+        <h3>منتجات قسم: {{ modalCategory?.name }}</h3>
+        <p class="modal-header-sub">
+          عدد المنتجات: <strong>{{ toArabicDigits(modalProducts.length) }}</strong> منتج
+          <span *ngIf="modalCategory?.isDefault" class="badge-tag default-tag">فئة افتراضية</span>
+        </p>
+      </div>
+      <button class="btn-close" (click)="closeCategoryProductsModal()">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <div *ngIf="isLoadingModalProducts" class="modal-loading-box">
+        <div class="luxury-spinner"></div>
+        <p>جاري تحميل منتجات القسم...</p>
+      </div>
+
+      <div *ngIf="!isLoadingModalProducts && modalProducts.length === 0" class="modal-empty-box">
+        <svg class="empty-box-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+        </svg>
+        <p class="empty-title">لا توجد منتجات مسجلة في هذا القسم حتى الآن.</p>
+        <p class="empty-subtitle">يمكنك إضافة أول منتج الآن وتعيين سعره ومخزونه وصورته.</p>
+        <button class="btn btn-primary btn-sm" (click)="openAddProductForCategory(modalCategory)">
+          + إضافة أول منتج في {{ modalCategory?.name }}
+        </button>
+      </div>
+
+      <div *ngIf="!isLoadingModalProducts && modalProducts.length > 0" class="category-prods-grid">
+        <div *ngFor="let prod of modalProducts" class="cat-prod-item">
+          <div class="cat-prod-media">
+            <span class="cat-prod-no-img">📦</span>
+          </div>
+          <div class="cat-prod-body">
+            <h4 class="cat-prod-name">{{ prod.name }}</h4>
+            <span class="cat-prod-code">باركود: {{ prod.barcode }}</span>
+            <div class="cat-prod-meta">
+              <span class="cat-prod-price">{{ toArabicDigits(prod.price) }} ج.م</span>
+              <span class="cat-prod-stock" [class.stock-warn]="prod.stock <= 5">
+                المخزون: {{ toArabicDigits(prod.stock) }}
+              </span>
+            </div>
+          </div>
+          <div class="cat-prod-action">
+            <button class="btn-table-action"
+              (click)="openEditProductModal(prod); closeCategoryProductsModal()">تعديل</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeCategoryProductsModal()">إغلاق</button>
+      <button *ngIf="modalCategory" class="btn btn-outline" (click)="goToProductsPageForCategory(modalCategory.id)">
+        الانتقال إلى جدول المنتجات الكامل &larr;
+      </button>
+      <button *ngIf="modalCategory" class="btn btn-primary" (click)="openAddProductForCategory(modalCategory)">
+        + إضافة منتج جديد
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 6. REGISTER DEVICE MODAL -->
+<div *ngIf="showDeviceModal" class="modal-backdrop">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>تسجيل جهاز ذكي جديد: {{ selectedStore?.name }}</h3>
+      <button class="btn-close" (click)="showDeviceModal = false">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>نوع الجهاز الذكي</label>
+        <select [(ngModel)]="deviceFormData.type" class="form-control">
+          <option *ngFor="let t of deviceTypes" [value]="t.value">{{ t.label }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>اسم الجهاز التعريفي</label>
+        <input type="text" [(ngModel)]="deviceFormData.name" placeholder="مثلاً: بوابة الدخول الرئيسية، كاميرا رف 1..."
+          class="form-control" />
+      </div>
+      <div class="form-group">
+        <label>كود الجهاز التسلسلي (Device Code / MAC)</label>
+        <input type="text" [(ngModel)]="deviceFormData.deviceCode" placeholder="DEV-001" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="deviceFormData.isOnline" />
+          <span>تفعيل الجهاز وبدء الاتصال بالإنترنت فوراً</span>
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="showDeviceModal = false">إلغاء</button>
+      <button class="btn btn-primary" (click)="saveDevice()">حفظ الجهاز</button>
+    </div>
+  </div>
+</div>
